@@ -8,12 +8,14 @@ import io.restassured.specification.RequestSpecification;
 import org.json.simple.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.*;
+//import static com.jayway.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 import java.util.ArrayList;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.requestSpecification;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 public class BaseTrelloTest {
 
@@ -32,7 +34,7 @@ public class BaseTrelloTest {
         RestAssured.baseURI = "https://api.trello.com";
 
 
-        CreateBoard();
+       // CreateBoard();
     }
 
     @AfterSuite
@@ -41,36 +43,30 @@ public class BaseTrelloTest {
         DeleteBoard();
     }
 
-
+@Test
     public void CreateBoard() {
 
 
         String name= "Things to Do";
 
-       // fillQueryParams();
-
-        /*
-        requestSpecification = given()
-                .body(requestJSon.toJSONString())
-                .log().all()
-                .contentType(ContentType.JSON);
-
-         */
-
         RequestSpecification requestSpecification = given()
                 .queryParam("key", "0697ace29da135af1009cc535346c753")
                 .queryParam("token", "4796c4db8c0b4d5f548a6ac73389331985e5e9eb7c6f6e588deb3b36062fa13f")
                 .queryParam("name", name)
-                .body(requestJSon.toJSONString())
-                .log().all()
-                .contentType(ContentType.JSON);
+                    .body(requestJSon.toJSONString())
+                    .log().all()
+                    .contentType(ContentType.JSON);
 
         Response response = requestSpecification.when().post("/1/boards");
         System.out.println(response.body());
 
-        response.then().statusCode(200).contentType(ContentType.JSON).extract()
-                    .response().body().jsonPath().getMap("$");
+        response.then().statusCode(200).
+                contentType(ContentType.JSON)
+                    .body(matchesJsonSchemaInClasspath("schema.json"))
+                .extract().response().jsonPath().getMap("$");
 
+
+    //matchesJsonSchemaInClasspath
         Map<String, ?> map = response.body().jsonPath().getMap("$");
         boardId = (String) map.get("id");
 

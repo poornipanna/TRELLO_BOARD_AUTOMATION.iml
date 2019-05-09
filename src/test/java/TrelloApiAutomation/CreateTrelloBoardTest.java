@@ -20,21 +20,24 @@ public class CreateTrelloBoardTest extends BaseTrelloTest
 {
 
 
-    @Test(priority=1)
+ //   @Test(priority=1)
     public void GetListsOfBoard()
     {
 
-        Response response =  given()
+        RequestSpecification requestSpecification =  given()
                 .pathParam("boardID",boardId)
                 .queryParam("key", key)
-                .queryParam("token", token).
-                        when().
+                .queryParam("token", token)
+                .body(requestJSon.toJSONString())
+                .log().all()
+                .contentType(ContentType.JSON);
+
+
+        Response response = requestSpecification.when().
                         get("boards/{boardID}/lists/");
 
         response.then()
-                .statusCode(200)
-                .contentType(ContentType.JSON)
-                .extract();
+                .statusCode(200);
 
         System.out.println(response.statusCode());
 
@@ -51,7 +54,7 @@ public class CreateTrelloBoardTest extends BaseTrelloTest
 
     }
 
-    @Test(priority=2)
+//    @Test(priority=2)
     public void createCardInList()
     {
 
